@@ -121,11 +121,7 @@ void Pause()
 
 unsigned int Sleep(unsigned int secs) 
 {
-    unsigned int rc;
-
-    if ((rc = sleep(secs)) < 0)
-	unix_error("Sleep error");
-    return rc;
+    return sleep(secs);
 }
 
 unsigned int Alarm(unsigned int seconds) {
@@ -804,7 +800,7 @@ ssize_t rio_writen(int fd, void *usrbuf, size_t n)
 /* $begin rio_read */
 static ssize_t rio_read(rio_t *rp, char *usrbuf, size_t n)
 {
-    int cnt;
+    size_t cnt;
 
     while (rp->rio_cnt <= 0) {  /* Refill if buf is empty */
 	rp->rio_cnt = read(rp->rio_fd, rp->rio_buf, 
@@ -820,9 +816,9 @@ static ssize_t rio_read(rio_t *rp, char *usrbuf, size_t n)
     }
 
     /* Copy min(n, rp->rio_cnt) bytes from internal buf to user buf */
-    cnt = n;          
-    if (rp->rio_cnt < n)   
-	cnt = rp->rio_cnt;
+    cnt = n;
+    if ((size_t)rp->rio_cnt < n)
+	cnt = (size_t)rp->rio_cnt;
     memcpy(usrbuf, rp->rio_bufptr, cnt);
     rp->rio_bufptr += cnt;
     rp->rio_cnt -= cnt;
@@ -870,7 +866,8 @@ ssize_t rio_readnb(rio_t *rp, void *usrbuf, size_t n)
 /* $begin rio_readlineb */
 ssize_t rio_readlineb(rio_t *rp, void *usrbuf, size_t maxlen) 
 {
-    int n, rc;
+    size_t n;
+    ssize_t rc;
     char c, *bufp = usrbuf;
 
     for (n = 1; n < maxlen; n++) { 
@@ -889,7 +886,7 @@ ssize_t rio_readlineb(rio_t *rp, void *usrbuf, size_t maxlen)
 	    return -1;	  /* Error */
     }
     *bufp = 0;
-    return n-1;
+    return (ssize_t)(n - 1);
 }
 /* $end rio_readlineb */
 
@@ -907,7 +904,10 @@ ssize_t Rio_readn(int fd, void *ptr, size_t nbytes)
 
 void Rio_writen(int fd, void *usrbuf, size_t n) 
 {
-    if (rio_writen(fd, usrbuf, n) != n)
+    ssize_t nwritten;
+
+    nwritten = rio_writen(fd, usrbuf, n);
+    if (nwritten < 0 || (size_t)nwritten != n)
 	unix_error("Rio_writen error");
 }
 
@@ -1065,7 +1065,6 @@ int Open_listenfd(char *port)
 }
 
 /* $end csapp.c */
-
 
 
 

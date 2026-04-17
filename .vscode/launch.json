@@ -102,6 +102,67 @@
             "sourceFileMap": {
                 "/workspaces/webproxy_lab_docker": "${workspaceFolder}"
             }
+        },
+        {
+            "name": "Debug Echo Server",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/webproxy-lab/echoserver/echoserver",
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}/webproxy-lab/echoserver",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "gdb",
+            "miDebuggerPath": "/usr/bin/gdb",
+            "preLaunchTask": "Echo server clean-and-build",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                },
+                {
+                    "description": "Set Disassembly Flavor to Intel",
+                    "text": "-gdb-set disassembly-flavor intel",
+                    "ignoreFailures": true
+                }
+            ],
+            "sourceFileMap": {
+                "/workspaces/webproxy_lab_docker": "${workspaceFolder}"
+            }
+        },
+        {
+            "name": "Debug Echo Client",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/webproxy-lab/echoserver/echoclient",
+            "args": [
+                "localhost",
+                "5000"
+            ],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}/webproxy-lab/echoserver",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "gdb",
+            "miDebuggerPath": "/usr/bin/gdb",
+            "preLaunchTask": "Echo client clean-and-build",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                },
+                {
+                    "description": "Set Disassembly Flavor to Intel",
+                    "text": "-gdb-set disassembly-flavor intel",
+                    "ignoreFailures": true
+                }
+            ],
+            "sourceFileMap": {
+                "/workspaces/webproxy_lab_docker": "${workspaceFolder}"
+            }
         }
     ]
 }

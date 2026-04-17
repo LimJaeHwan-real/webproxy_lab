@@ -5,6 +5,18 @@
 #ifndef __CSAPP_H__
 #define __CSAPP_H__
 
+/*
+ * Expose POSIX networking and signal APIs even when the editor or
+ * toolchain parses the project in a strict C standard mode.
+ */
+#ifndef _POSIX_C_SOURCE
+#define _POSIX_C_SOURCE 200809L
+#endif
+
+#ifndef _DEFAULT_SOURCE
+#define _DEFAULT_SOURCE
+#endif
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdarg.h>

@@ -98,6 +98,131 @@
                 "panel": "new"
             },
             "problemMatcher": []
+        },
+        {
+            "label": "Echo server build",
+            "type": "shell",
+            "command": "gcc",
+            "args": [
+                "-g",
+                "-Wall",
+                "${workspaceFolder}/webproxy-lab/echoserver/echoserver.c",
+                "${workspaceFolder}/webproxy-lab/echoserver/echo.c",
+                "${workspaceFolder}/webproxy-lab/csapp.c",
+                "-o",
+                "${workspaceFolder}/webproxy-lab/echoserver/echoserver",
+                "-lpthread"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": false
+            },
+            "presentation": {
+                "reveal": "always",
+                "panel": "new"
+            },
+            "problemMatcher": [
+                "$gcc"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}/webproxy-lab/echoserver"
+            }
+        },
+        {
+            "label": "Echo server clean",
+            "type": "shell",
+            "command": "rm",
+            "args": [
+                "-f",
+                "${workspaceFolder}/webproxy-lab/echoserver/echoserver"
+            ],
+            "presentation": {
+                "reveal": "always",
+                "panel": "new"
+            },
+            "problemMatcher": [],
+            "options": {
+                "cwd": "${workspaceFolder}/webproxy-lab/echoserver"
+            }
+        },
+        {
+            "label": "Echo server clean-and-build",
+            "dependsOrder": "sequence",
+            "dependsOn": [
+                "Echo server clean",
+                "Echo server build"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": false
+            },
+            "presentation": {
+                "reveal": "always",
+                "panel": "new"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "Echo client build",
+            "type": "shell",
+            "command": "gcc",
+            "args": [
+                "-g",
+                "-Wall",
+                "${workspaceFolder}/webproxy-lab/echoserver/echoclient.c",
+                "${workspaceFolder}/webproxy-lab/csapp.c",
+                "-o",
+                "${workspaceFolder}/webproxy-lab/echoserver/echoclient",
+                "-lpthread"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": false
+            },
+            "presentation": {
+                "reveal": "always",
+                "panel": "new"
+            },
+            "problemMatcher": [
+                "$gcc"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}/webproxy-lab/echoserver"
+            }
+        },
+        {
+            "label": "Echo client clean",
+            "type": "shell",
+            "command": "rm",
+            "args": [
+                "-f",
+                "${workspaceFolder}/webproxy-lab/echoserver/echoclient"
+            ],
+            "presentation": {
+                "reveal": "always",
+                "panel": "new"
+            },
+            "problemMatcher": [],
+            "options": {
+                "cwd": "${workspaceFolder}/webproxy-lab/echoserver"
+            }
+        },
+        {
+            "label": "Echo client clean-and-build",
+            "dependsOrder": "sequence",
+            "dependsOn": [
+                "Echo client clean",
+                "Echo client build"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": false
+            },
+            "presentation": {
+                "reveal": "always",
+                "panel": "new"
+            },
+            "problemMatcher": []
         }
     ]
 }
