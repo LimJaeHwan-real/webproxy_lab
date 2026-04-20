@@ -14,7 +14,8 @@ int main(int argc, char **argv)
     rio_t rio;
 
     /* 실행 인자가 호스트와 포트까지 총 3개인지 확인한다. */
-    if (argc != 3) {
+    if (argc != 3)
+    {
         /* 사용법이 틀렸다면 표준 에러로 실행 형식을 출력한다. */
         fprintf(stderr, "usage: %s <host> <port>\n", argv[0]);
         /* 잘못된 사용이므로 프로그램을 종료한다. */
@@ -33,12 +34,14 @@ int main(int argc, char **argv)
     Rio_readinitb(&rio, clientfd);
 
     /* 표준 입력에서 한 줄씩 읽어서 서버로 보내고 응답을 받는다. */
-    while (Fgets(buf, MAXLINE, stdin) != NULL) {
+    while (Fgets(buf, MAXLINE, stdin) != NULL)
+    {
         /* 사용자가 입력한 문자열 전체를 서버로 전송한다. */
         Rio_writen(clientfd, buf, strlen(buf));
 
         /* 서버가 돌려준 한 줄을 읽는다. */
-        if (Rio_readlineb(&rio, buf, MAXLINE) == 0) {
+        if (Rio_readlineb(&rio, buf, MAXLINE) == 0)
+        {
             /* 서버가 예상보다 빨리 연결을 끊었다면 에러로 처리한다. */
             app_error("server closed connection unexpectedly");
         }

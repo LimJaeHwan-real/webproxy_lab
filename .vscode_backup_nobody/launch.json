@@ -14,6 +14,7 @@
             "environment": [],
             "externalConsole": false,
             "MIMode": "gdb",
+            "miDebuggerPath": "/usr/bin/gdb",
             "preLaunchTask": "Tiny server clean-and-build",
             "setupCommands": [
                 {
@@ -64,6 +65,7 @@
             "environment": [],
             "externalConsole": false,
             "MIMode": "gdb",
+            "miDebuggerPath": "/usr/bin/gdb",
             "preLaunchTask": "Proxy server clean-and-build",
             "setupCommands": [
                 {
@@ -114,6 +116,7 @@
             "environment": [],
             "externalConsole": false,
             "MIMode": "gdb",
+            "miDebuggerPath": "/usr/bin/gdb",
             "preLaunchTask": "Echo server build",
             "setupCommands": [
                 {
@@ -128,8 +131,7 @@
                 }
             ],
             "sourceFileMap": {
-                "/workspaces/webproxy_lab_docker": "${workspaceFolder}",
-                "${workspaceFolder}/webproxy-lab": "${workspaceFolder}/webproxy-lab"
+                "/workspaces/webproxy_lab_docker": "${workspaceFolder}"
             }
         },
         {
@@ -146,6 +148,7 @@
             "environment": [],
             "externalConsole": false,
             "MIMode": "gdb",
+            "miDebuggerPath": "/usr/bin/gdb",
             "preLaunchTask": "Echo client build",
             "setupCommands": [
                 {
@@ -160,8 +163,7 @@
                 }
             ],
             "sourceFileMap": {
-                "/workspaces/webproxy_lab_docker": "${workspaceFolder}",
-                "${workspaceFolder}/webproxy-lab": "${workspaceFolder}/webproxy-lab"
+                "/workspaces/webproxy_lab_docker": "${workspaceFolder}"
             }
         }
     ]

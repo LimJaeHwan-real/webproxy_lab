@@ -1,4 +1,4 @@
-#include "../csapp.h"
+#include "../webproxy-lab-owned/csapp.c"
 #include "echo.h"
 /* 한 클라이언트와 에코 통신을 수행하는 함수를 미리 선언한다. */
 
