@@ -108,10 +108,12 @@ void read_requesthdrs(rio_t *rp)
 {
   char buf[MAXLINE];
 
+  // 예: GET /index.html HTTP/1.1
   Rio_readlineb(rp, buf, MAXLINE);
   printf("%s", buf);
   while (strcmp(buf, "\r\n"))
   {
+    // 예: Host: ..., User-Agent: ...
     Rio_readlineb(rp, buf, MAXLINE);
     printf("%s", buf);
   }
@@ -187,13 +189,15 @@ void serve_static(int fd, char *filename, int filesize)
   n = snprintf(p, remaining, "Content-type: %s\r\n\r\n", filetype);
   p += n;
   remaining -= n;
-
+  // buf 문자열 길이만큼 fd에 정확히 써라
   Rio_writen(fd, buf, strlen(buf));
   printf("Response headers:\n");
   printf("%s", buf);
 
   /* Send response body to client */
   srcfd = Open(filename, O_RDONLY, 0);
+  // srcfd 앞부분부터 filesize 바이트만큼 읽기 가능하게 메모리에 연결하라
+  // MAP_PRIVATE : 매핑 메모리 수정해도 원본 파일 안바뀜, 파일 읽어 오되, 복사본처럼 다룸
   srcp = Mmap(0, filesize, PROT_READ, MAP_PRIVATE, srcfd, 0);
   Close(srcfd);
   Rio_writen(fd, srcp, filesize);
@@ -241,6 +245,8 @@ void serve_dynamic(int fd, char *filename, char *cgiargs)
   if (pid == 0)
   { /* Child process */
     /* Real server would set all CGI vars here */
+    // 환경변수 QUERY_STRING에 cgiargs 값을 넣는다
+    // 1: 이미 있으면 덮어쓰기
     setenv("QUERY_STRING", cgiargs, 1);
 
     /* Redirect stdout to client */
@@ -252,6 +258,17 @@ void serve_dynamic(int fd, char *filename, char *cgiargs)
     Close(fd);
 
     /* Run CGI program */
+    // 현재 프로세스를 새로운 프로그램으로 바꿔 실행
+    // execve("./adder", argv, environ)
+    //       ( 파일경로 , 인자들, 환경변수들)
+
+    /*환경 변수 예시
+
+      "PATH=/usr/bin"
+      "HOME=/home/user"
+      "QUERY_STRING=a=10&b=20"
+      NULL
+      */
     Execve(filename, emptylist, environ);
 
     /* If we get here, Execve failed */

@@ -11,6 +11,7 @@ int main(void)
   int n1 = 0, n2 = 0;
 
   /* Extract the two arguments */
+  // buf="a=10&b=10";
   if ((buf = getenv("QUERY_STRING")) != NULL)
   {
     p = strchr(buf, '&');
@@ -34,6 +35,7 @@ int main(void)
   printf("Content-length: %d\r\n", (int)strlen(content));
   printf("\r\n");
   printf("%s", content);
+  // 버퍼의 내용 즉시 내보내기
   fflush(stdout);
 
   exit(0);
