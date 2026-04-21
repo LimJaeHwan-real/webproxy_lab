@@ -53,11 +53,21 @@ void doit(int fd)
   char filename[MAXLINE], cgiargs[MAXLINE];
   rio_t rio;
 
-  // Read request line and headers
+  // 클라이언트 소켓과 RIO 버퍼를 연결한다.
+  // 이후에는 Rio_readlineb로 HTTP 요청을 한 줄씩 안전하게 읽을 수 있다.
   Rio_readinitb(&rio, fd);
+
+  // HTTP 요청의 첫 줄(request line)을 읽는다.
+  // 예: "GET /index.html HTTP/1.1\r\n"
+  // 11.6(A) 요구사항에 맞게 이 줄도 그대로 출력해서
+  // 브라우저가 실제로 어떤 방식으로 요청했는지 확인할 수 있게 한다.
   Rio_readlineb(&rio, buf, MAXLINE);
-  printf("Request headers:\n");
+  printf("Request line and headers:\n");
   printf("%s", buf);
+
+  // 요청 라인에서 메서드, URI, HTTP 버전을 분리한다.
+  // exercise 11.6(C)에서는 여기서 읽은 version 값을 보고
+  // 브라우저가 HTTP/1.0을 쓰는지 HTTP/1.1을 쓰는지 판단할 수 있다.
   sscanf(buf, "%s %s %s", method, uri, version);
   if (strcasecmp(method, "GET"))
   {
@@ -121,11 +131,26 @@ void clienterror(int fd, char *cause, char *errnum, char *shortmsg, char *longms
 void read_requesthdrs(rio_t *rp)
 {
   char buf[MAXLINE];
-  // GET /index.html HTTP/1.1
-  Rio_readlineb(rp, buf, MAXLINE);
-  while (strcmp(buf, "\r\n"))
+
+  // request line 다음에는 0개 이상의 request header가 이어진다.
+  // 각 줄을 하나씩 읽어서 그대로 출력하면 exercise 11.6(A)의
+  // "every request header를 echo" 요구사항을 만족할 수 있다.
+  //
+  // 헤더의 끝은 빈 줄("\r\n")로 표시되므로,
+  // 빈 줄을 만나기 전까지 모든 헤더 줄을 정확히 한 번씩 출력한다.
+  while (1)
   {
     Rio_readlineb(rp, buf, MAXLINE);
+    if (!strcmp(buf, "\r\n"))
+    {
+      // 빈 줄은 "헤더가 여기서 끝났다"는 의미다.
+      // 가독성을 위해 터미널에도 한 줄 띄워서 요청 블록의 끝을 보여준다.
+      printf("\n");
+      break;
+    }
+
+    // 실제 브라우저가 보낸 헤더를 수정하지 않고 그대로 출력한다.
+    // 예: Host, User-Agent, Accept, Sec-Fetch-* 등
     printf("%s", buf);
   }
   return;
@@ -188,6 +213,13 @@ void serve_static(int fd, char *filename, int filesize)
 
 void get_filetype(char *filename, char *filetype)
 {
+  // 파일 이름에 포함된 확장자를 보고 HTTP Content-type을 결정한다.
+  // 브라우저는 이 값을 보고 응답 본문을 HTML로 렌더링할지,
+  // 이미지로 표시할지, 비디오로 재생할지를 판단한다.
+  //
+  // Tiny는 정적 파일을 그대로 읽어서 보내는 구조이므로,
+  // 새로운 파일 형식을 지원할 때는 보통 여기에서 MIME 타입만
+  // 올바르게 지정해 주면 된다.
   if (strstr(filename, ".html"))
     strcpy(filetype, "text/html");
   else if (strstr(filename, ".gif"))
@@ -196,7 +228,13 @@ void get_filetype(char *filename, char *filetype)
     strcpy(filetype, "image/png");
   else if (strstr(filename, ".jpg"))
     strcpy(filetype, "image/jpeg");
+  else if (strstr(filename, ".mpg") || strstr(filename, ".mpeg"))
+    // MPEG 비디오 파일은 video/mpeg로 응답해야 브라우저가
+    // 다운로드 대상이 아니라 비디오 컨텐츠로 해석할 수 있다.
+    strcpy(filetype, "video/mpeg");
   else
+    // 위에서 모르는 확장자는 일단 일반 텍스트로 보낸다.
+    // 교육용 Tiny 예제의 기본 동작을 그대로 유지한다.
     strcpy(filetype, "text/plain");
 }
 void serve_dynamic(int fd, char *filename, char *cgiargs)
