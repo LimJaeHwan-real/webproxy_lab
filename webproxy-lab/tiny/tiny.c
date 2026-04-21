@@ -202,13 +202,44 @@ void serve_static(int fd, char *filename, int filesize)
   printf("Response headers:\n");
   printf("%s", buf);
 
-  // Send reponse body to client
+  // 이제 실제 파일 내용을 클라이언트에게 보낸다.
+  //
+  // 원래 Tiny 예제는 mmap을 사용해서
+  // "파일 내용을 메모리에 바로 연결"한 뒤 전송할 수 있다.
+  // 이번 버전은 그 대신 더 직관적인 방법을 사용한다.
+  //
+  // 1. malloc으로 파일 크기만큼 메모리를 직접 확보하고
+  // 2. Rio_readn으로 파일 내용을 그 메모리 버퍼에 읽어오고
+  // 3. Rio_writen으로 그 버퍼 내용을 소켓(fd)에 그대로 보낸다.
+  //
+  // 비전공자 관점에서 보면:
+  // "파일을 통째로 메모리 상자에 담아 온 다음,
+  //  그 상자 내용을 네트워크 선으로 그대로 보내는 과정"이라고 이해하면 된다.
   srcfd = Open(filename, O_RDONLY, 0);
-  // mmap addr null = 커널이 매핑할 가상 메모리 주소 알아서 정해라
-  srcp = Mmap(0, filesize, PROT_READ, MAP_PRIVATE, srcfd, 0);
+
+  // 파일 전체를 저장할 메모리 공간을 직접 만든다.
+  // filesize 바이트만큼 확보하므로, 이 버퍼에는 파일 내용이 그대로 들어간다.
+  srcp = (char *)malloc(filesize);
+  if (srcp == NULL)
+    unix_error("malloc error");
+
+  // 파일 디스크립터 srcfd에서 filesize 바이트를 읽어
+  // 방금 확보한 메모리 버퍼 srcp에 채운다.
+  //
+  // 여기서는 문자열처럼 '\0'을 만날 때까지 읽는 것이 아니라,
+  // stat으로 확인한 "정확한 파일 크기"만큼 읽는다.
+  // 그래서 HTML 같은 텍스트 파일뿐 아니라 jpg, gif, mpg 같은
+  // 바이너리 파일도 중간의 0x00 바이트 때문에 끊기지 않는다.
+  Rio_readn(srcfd, srcp, filesize);
   Close(srcfd);
+
+  // 메모리 버퍼에 담긴 파일 내용을 클라이언트 소켓으로 그대로 내보낸다.
+  // fd는 브라우저와 연결된 소켓이고, filesize만큼 정확히 전송한다.
   Rio_writen(fd, srcp, filesize);
-  Munmap(srcp, filesize);
+
+  // malloc으로 직접 확보한 메모리는 사용이 끝나면 반드시 반환해야 한다.
+  // 그렇지 않으면 서버가 요청을 처리할 때마다 메모리를 계속 잃어버리게 된다.
+  free(srcp);
 }
 
 void get_filetype(char *filename, char *filetype)
