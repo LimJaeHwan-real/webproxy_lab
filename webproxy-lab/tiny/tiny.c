@@ -263,6 +263,10 @@ void get_filetype(char *filename, char *filetype)
     // MPEG 비디오 파일은 video/mpeg로 응답해야 브라우저가
     // 다운로드 대상이 아니라 비디오 컨텐츠로 해석할 수 있다.
     strcpy(filetype, "video/mpeg");
+  else if (strstr(filename, ".mp4"))
+  {
+    strcpy(filetype, "video/mp4");
+  }
   else
     // 위에서 모르는 확장자는 일단 일반 텍스트로 보낸다.
     // 교육용 Tiny 예제의 기본 동작을 그대로 유지한다.
